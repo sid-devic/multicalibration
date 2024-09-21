@@ -1,0 +1,23 @@
+[build-system]
+requires = ["setuptools>=61.0", "numpy", "tqdm"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "multicalibration"
+version = "0.0.1"
+authors = [
+  { name="Siddartha Devic", email="sid.devic@gmail.com" },
+  { name="Dutch Hansen", email="none@gmail.com"}
+]
+description = "Multicalibration post-processing in python."
+readme = "README.md"
+requires-python = ">=3.8"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+
+[project.urls]
+Homepage = "https://github.com/sid-devic/multicalibration"
+Issues = "https://github.com/sid-devic/multicalibration/issues"

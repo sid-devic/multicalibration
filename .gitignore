@@ -1,2 +1,5 @@
 __pycache__/
 plots/*
+dist
+src/multicalibration.egg-info
+examples/plots*

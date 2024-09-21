@@ -1,4 +1,4 @@
-from multicalibration.mcb import MulticalibrationPredictor
+from multicalibration import MulticalibrationPredictor
 from utils import generate_correlated_subgroup_data, create_calibration_plots, calibration_error
 
 
