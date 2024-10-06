@@ -2,10 +2,7 @@ import numpy as np
 from tqdm import trange
 from multicalibration.HJZ.online_learners import Hedge, MLProd, OnlineGradientDescent, OptimisticHedge
 from multicalibration.HJZ.adversary import update_hedge_algorithms, Adversary
-from multicalibration.HJZ.utils import (
-    discretize_values,
-    calculate_average_labels,
-)
+from multicalibration.HJZ.utils import discretize_values, calculate_average_labels
 
 ALG_CLASSES = {
     'Hedge': Hedge,
@@ -23,26 +20,27 @@ class HJZAlgorithm:
     https://github.com/ericzhao28/multicalibration?tab=readme-ov-file    
     """
     
-    def __init__(self, params):
+    def __init__(self):
         """
         Initialize Multicalibration Predictor.
-        """
-        # parameters
-        self.alg_class = ALG_CLASSES[params['algorithm']]
-        self.other_alg_class = ALG_CLASSES[params['other_algorithm']]
-        self.lr, self.other_lr = params['lr'], params['other_lr']
-        self.n_bins = params['n_bins']
-        self.iterations = params['iterations']
-        
+        """        
         # constants in original implementations
         self.base_lr = 1
         self.base_other_lr = 100
 
-
-    def fit(self, confs, labels, subgroups):
+    def fit(self, confs, labels, subgroups, params):
         """
         HJZ implementation updates training / validation 
         """
+        try:
+            # parameters
+            self.alg_class = ALG_CLASSES[params['algorithm']]
+            self.other_alg_class = ALG_CLASSES[params['other_algorithm']]
+            self.lr, self.other_lr = params['lr'], params['other_lr']
+            self.n_bins = params['n_bins']
+            self.iterations = params['iterations']
+        except KeyError as e:
+            raise ValueError(f"Missing parameter: {e}. Please provide all required parameters (algorithm, other_algorithm, lr, other_lr, n_bins, iterations) as a dictionary.")
 
         adv = None
         self.learning_rate = lambda x: self.base_lr * np.power(self.lr, x)
@@ -50,8 +48,8 @@ class HJZAlgorithm:
         groups_train = subgroups
 
         # 1-hot encode labels
-        c = self.populate_probs(confs.copy())
-        l = self.populate_probs(labels.copy())
+        c = self._populate_probs(confs.copy())
+        l = self._populate_probs(labels.copy())
         self.target_dim = len(l[0])
 
         # track for prediction
@@ -106,13 +104,12 @@ class HJZAlgorithm:
                 self.learning_rate(i),
             )
 
-
-    def batch_predict(self, f_xs, groups):
+    def predict(self, f_xs, groups):
         """
         Returns calibrated predictions for a batch of data points.
         """
         groups_eval = groups
-        c = self.populate_probs(f_xs.copy())
+        c = self._populate_probs(f_xs.copy())
         algs = [
             self.alg_class(self.target_dim, 
                            learning_rate=self.learning_rate(1), 
@@ -148,7 +145,7 @@ class HJZAlgorithm:
         return np.array([alg.weights for alg in algs])[:, 1]
     
 
-    def populate_probs(self, probs):
+    def _populate_probs(self, probs):
         """
         Populate probabilities across classes, given positive-class confidences.
         """

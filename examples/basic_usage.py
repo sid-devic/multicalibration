@@ -17,11 +17,11 @@ if __name__ == '__main__':
     }
 
     # Initialize and fit HKRR predictor
-    hkrr_predictor = MulticalibrationPredictor('HKRR', hkrr_params)
-    hkrr_predictor.fit(probs, labels, subgroups)
+    mcb = MulticalibrationPredictor('HKRR')
+    mcb.fit(probs, labels, subgroups, hkrr_params)
 
     # Make predictions using HKRR
-    hkrr_probs = hkrr_predictor.batch_predict(probs, subgroups)
+    hkrr_probs = mcb.predict(probs, subgroups)
 
     # Create calibration plots for HKRR
     create_calibration_plots(probs, labels, hkrr_probs, subgroups, 'HKRR_Multicalibration')
@@ -37,11 +37,11 @@ if __name__ == '__main__':
     }
 
     # Initialize and fit HJZ predictor
-    hjz_predictor = MulticalibrationPredictor('HJZ', hjz_params)
-    hjz_predictor.fit(probs, labels, subgroups)
+    hjz_predictor = MulticalibrationPredictor('HJZ')
+    hjz_predictor.fit(probs, labels, subgroups, hjz_params)
 
     # Make predictions using HJZ
-    hjz_probs = hjz_predictor.batch_predict(probs, subgroups)
+    hjz_probs = hjz_predictor.predict(probs, subgroups)
 
     # Create calibration plots for HJZ
     create_calibration_plots(probs, labels, hjz_probs, subgroups, 'HJZ_Multicalibration')

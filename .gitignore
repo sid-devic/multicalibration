@@ -3,3 +3,4 @@ plots/*
 dist
 src/multicalibration.egg-info
 examples/plots*
+examples/data*

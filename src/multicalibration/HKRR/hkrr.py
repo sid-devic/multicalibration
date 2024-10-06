@@ -7,29 +7,34 @@ class HKRRAlgorithm:
     HKRR, Algorithm 1. Based partially on the code here:
     https://github.com/sanatonek/fairness-and-callibration/tree/893c9738bf8e01d089568b1d7a56a8b53037e5fb
     """
-
-    def __init__(self, params):
+    def __init__(self):
         """
         Multicalibrate Predictions on Training Set
-        """
-        self.lmbda = params['lambda']
-        self.alpha = params['alpha']
-        self.max_iter = params['max_iter']
-        self.randomized = params['randomized']
-        self.use_oracle = params['use_oracle']
+        """        
         self.v_hat_saved = []
         self.delta_iters = None
         self.subgroup_updated_iters = None
         self.v_updated_iters = None
 
-    def fit(self, confs, labels, subgroups):
+    def fit(self, confs, labels, subgroups, params):
         """
         confs: initial confs on positive class
         labels: labels for each data point
         subgroups: (ordered) list of lists where each entry is a list of all indices of data belonging to 
                     a certain subgroup
         max_iter: max # iterations before terminating
+        params: dictionary of hyperparameters
         """
+        try:
+            self.lmbda = params['lambda']
+            self.alpha = params['alpha']
+            self.max_iter = params['max_iter']
+            self.randomized = params['randomized']
+            self.use_oracle = params['use_oracle']
+
+        except KeyError as e:
+            raise ValueError(f"Missing parameter: {e}. Please provide all required parameters (lambda, alpha, max_iter, randomized, use_oracle) as a dictionary.")
+
 
         # init predictions
         p = confs.copy()
@@ -144,7 +149,7 @@ class HKRRAlgorithm:
 
         return r
 
-    def predict(self, f_x, subgroups_containing_x, early_stop=None):
+    def _circuit_predict(self, f_x, subgroups_containing_x, early_stop=None):
         """
         Adjust Test-Set Predictions with Deltas from Multicalibration Procedure
             for $x \in X$:
@@ -187,7 +192,7 @@ class HKRRAlgorithm:
 
         return mcb_pred
 
-    def batch_predict(self, f_xs, groups, early_stop=None):
+    def predict(self, f_xs, groups, early_stop=None):
         """
         :param f_x: initial prediction (float)
         """
@@ -196,6 +201,6 @@ class HKRRAlgorithm:
         mcb_preds = f_xs.copy()
 
         for i in trange(len(f_xs)):
-            mcb_preds[i] = self.predict(f_xs[i], [j for j in range(len(groups)) if i in groups[j]], early_stop=early_stop)
+            mcb_preds[i] = self._circuit_predict(f_xs[i], [j for j in range(len(groups)) if i in groups[j]], early_stop=early_stop)
 
         return mcb_preds

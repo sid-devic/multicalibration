@@ -8,21 +8,19 @@ class MulticalibrationPredictor:
     """
     General Multicalibration Predictor class.
     """
-    
-    def __init__(self, algorithm, params=None):
+    def __init__(self, algorithm):
         """
         Initialize Multicalibration Predictor.
         """
         self.algorithm = algorithm
-        self.params = params
         if algorithm == 'HKRR':
-            self.mcbp = HKRRAlgorithm(params)
+            self.mcbp = HKRRAlgorithm()
         elif algorithm == 'HJZ':
-            self.mcbp = HJZAlgorithm(params)
+            self.mcbp = HJZAlgorithm()
         else:
-            raise ValueError(f"Algorithm {algorithm} not supported")
+            raise ValueError(f"Multicalibration algorithm {algorithm} not recognized / supported.")
 
-    def fit(self, confs, labels, subgroups):
+    def fit(self, confs, labels, subgroups, params):
         """
         Returns vector of confidences on calibration set.
 
@@ -31,12 +29,11 @@ class MulticalibrationPredictor:
         # Check if labels are binary
         if len(np.unique(labels)) > 2:
             raise ValueError("Labels must be binary. Multiclass not supported (yet).")
-        
-        self.mcbp.fit(confs, labels, subgroups)
+        self.mcbp.fit(confs, labels, subgroups, params)
 
-    def batch_predict(self, f_xs, groups):
+    def predict(self, f_xs, groups):
         """
         Returns calibrated predictions for a batch of data points.
         HKRR: early_stop=None
         """
-        return self.mcbp.batch_predict(f_xs, groups)
+        return self.mcbp.predict(f_xs, groups)
