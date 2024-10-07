@@ -1,7 +1,8 @@
 # Multicalibration Post-Processing Python Package
 Multicalibration is a Python package that implements a model post-processing method of the [same name](https://arxiv.org/abs/1711.08513).
 The goal of multicalibration post-processing algorithms are to improve the calibration of a model not only overall, but also on specified subpopulations (or "groups"/"subgroups") given as input.
-This package provides implementations of two multicalibration algorithms: HKRR (from the original multicalibration paper), and [HJZ](https://arxiv.org/abs/2302.10863).
+Multicalibration originated in the field of algorithmic fairness, and was suggested in order to provide better performance of machine learning models on protected subpopulations of the data.
+This package provides implementations of two multicalibration algorithms: [HKRR](https://arxiv.org/abs/1711.08513) (from the original multicalibration paper), and [HJZ](https://arxiv.org/abs/2302.10863).
 
 The package can be installed via pip:
 ```bash
@@ -10,7 +11,7 @@ pip install multicalibration
 The package can also be installed by cloning the git repository:
 ```bash
 git clone https://github.com/sid-devic/multicalibration.git
-cd multicalibration
+cd multicalibration/
 pip install .
 ```
 
@@ -42,7 +43,7 @@ hkrr_probs = mcb.predict(probs, subgroups)
 In the above code, `probs` is a length `n` array of a model's probabilistic predictions (e.g., `prob[i]` gives confidence in [0,1] that the model believes datapoint `i` should be classified with label `1`).
 The `labels` array is a length `n` binary array with the true labels of each datapoint. 
 Most importantly, `subgroups` is a length `n_groups` (number of subgroups) array, where each index `subgroups[j]` gives all indices of datapoints `i` which belong to subgroup `j`.
-For example, if there were three datapoints and two groups, the following `subgroups` array would represent that the first two datapoints (`i=0,1`) belong to group one, and the second two datapoints (`i=1,2`) belong to group two.
+For example, if there were three datapoints and two groups, the following `subgroups` array would represent that the first two datapoints (`i=0,1`) belong to group one, and the second two datapoints (`i=1,2`) belong to group two:
 ```python
 subgroups = [[0, 1], [1, 2]]
 ```
@@ -92,4 +93,10 @@ The HKRR implementation is based in part on the implementation found [here](http
 ### Contribute
 Thank you for your interest!
 We plan to slowly incorporate additional multicalibration-style algorithms into this package, as we believe that practitioners stand to benefit from accessible implementations of these algorithms.
-Please contact `devic[at]usc.edu` if you are interested in contributing.
+If you would like to help on this effort, please contact `devic[at]usc.edu`. You may also want to install the package in editable mode via
+```bash
+git clone https://github.com/sid-devic/multicalibration.git
+cd multicalibration/
+pip install -e .
+```
+This will allow you to modify the source files without re-installing the package each time.
