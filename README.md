@@ -16,8 +16,10 @@ pip install .
 ```
 
 ## Example Usage
-Multicalibration post-processing takes as input a set of _probabilistic predictions_, true labels for those predictions, and a list of subgroups.
-Importantly, datapoints may belong to multiple subgroups: that is, subgroups may be very complex and overlapping.
+Multicalibration post-processing takes as input a set of _probabilistic predictions_, true labels for those predictions, and a list of subgroups membership lists.
+The goal is to improve the calibration of the predictions conditioned on each subgroup list.
+This is done in a black-box and post-hoc manner: the multicalibration algorithm only operates on and modifies the _predictions_ of the model, and not the model itself.
+Importantly, datapoints may belong to multiple subgroups: that is, subgroups can potentially be both complex and overlapping.
 In `examples/basic_usage.py`, we give a short example of applying the HKRR algorithm on some synthetic data, summarized here.
 ```python
 # Generate some synthetic data
@@ -26,11 +28,11 @@ n_groups = len(subgroups)
 
 # Hyperparams for HKRR predictor
 hkrr_params = {
-    'alpha': 0.1,
-    'lambda': 0.01,
-    'max_iter': 100,
-    'randomized': True,
-    'use_oracle': False,
+    'alpha': 0.1,           # Permitted subgroup calibration violation
+    'lambda': 0.1,          # Prediction discretization granularity
+    'max_iter': 100,        # Maximum num iterations (circuit depth)
+    'randomized': True,     # Randomized subgroup ordering within each circuit level
+    'use_oracle': False,    # Use of statistical query oracle (used mainly in theoretical analysis)
 }
 
 # Initialize and fit HKRR predictor
@@ -86,7 +88,7 @@ Finally, if you used the HJZ algorithm, please cite the authors work:
 
 ### Acknowledgements and License
 This repository is under the MIT license. Most of the original implementation work was done by Dutch Hansen as an undergraduate research assistant at the University of Southern California.
-This repository also uses Eric Zhao's implemention of HJZ from the original paper, found [here](https://github.com/ericzhao28/multicalibration) (also on the MIT license).
+This repository also uses Eric Zhao's implemention of HJZ taken from [here](https://github.com/ericzhao28/multicalibration) (also on the MIT license).
 We sincerely thank Eric for help debugging and implementing the algorithm.
 The HKRR implementation is based in part on the implementation found [here](https://github.com/sanatonek/fairness-and-callibration/tree/893c9738bf8e01d089568b1d7a56a8b53037e5fb). We thank the original authors Saina Asani, Sana Tonekaboni, and Shuja Khalid. Unfortunately, we were not able to find a license for their work.
 
