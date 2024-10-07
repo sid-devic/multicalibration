@@ -23,31 +23,31 @@ class TestMulticalibrationPredictor(unittest.TestCase):
         }
 
     def test_initialization(self):
-        hkrr_predictor = MulticalibrationPredictor('HKRR', self.hkrr_params)
+        hkrr_predictor = MulticalibrationPredictor('HKRR')
         self.assertIsInstance(hkrr_predictor.mcbp, HKRRAlgorithm)
 
-        hjz_predictor = MulticalibrationPredictor('HJZ', self.hjz_params)
+        hjz_predictor = MulticalibrationPredictor('HJZ')
         self.assertIsInstance(hjz_predictor.mcbp, HJZAlgorithm)
 
         with self.assertRaises(ValueError):
             MulticalibrationPredictor('INVALID', {})
 
     def test_fit_input_validation(self):
-        predictor = MulticalibrationPredictor('HKRR', self.hkrr_params)
+        predictor = MulticalibrationPredictor('HKRR')
         
         # Test binary labels
         with self.assertRaises(ValueError):
-            predictor.fit(np.array([0.1, 0.2, 0.3]), np.array([0, 1, 2]), np.array([[1, 0], [0, 1], [1, 1]]))
+            predictor.fit(np.array([0.1, 0.2, 0.3]), np.array([0, 1, 2]), np.array([[1, 0], [0, 1], [1, 1]]), self.hkrr_params)
 
     def test_fit_and_predict(self):
-        predictor = MulticalibrationPredictor('HKRR', self.hkrr_params)
+        predictor = MulticalibrationPredictor('HKRR')
         
         # Sample data
         confs = np.array([0.1, 0.3, 0.5, 0.7, 0.9])
         labels = np.array([0, 0, 1, 1, 1])
         subgroups = np.array([[1, 0], [1, 0], [0, 1], [0, 1], [1, 1]])
 
-        predictor.fit(confs, labels, subgroups)
+        predictor.fit(confs, labels, subgroups, self.hkrr_params)
 
         # Test batch_predict
         f_xs = np.array([0.2, 0.6, 0.8])

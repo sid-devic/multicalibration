@@ -8,13 +8,13 @@ class MulticalibrationPredictor:
     """
     General Multicalibration Predictor class.
     """
-    def __init__(self, algorithm):
+    def __init__(self, algorithm, verbose=False):
         """
         Initialize Multicalibration Predictor.
         """
         self.algorithm = algorithm
         if algorithm == 'HKRR':
-            self.mcbp = HKRRAlgorithm()
+            self.mcbp = HKRRAlgorithm(verbose=verbose)
         elif algorithm == 'HJZ':
             self.mcbp = HJZAlgorithm()
         else:

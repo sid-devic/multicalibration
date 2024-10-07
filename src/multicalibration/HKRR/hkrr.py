@@ -7,7 +7,7 @@ class HKRRAlgorithm:
     HKRR, Algorithm 1. Based partially on the code here:
     https://github.com/sanatonek/fairness-and-callibration/tree/893c9738bf8e01d089568b1d7a56a8b53037e5fb
     """
-    def __init__(self):
+    def __init__(self, verbose=False):
         """
         Multicalibrate Predictions on Training Set
         """        
@@ -15,6 +15,7 @@ class HKRRAlgorithm:
         self.delta_iters = None
         self.subgroup_updated_iters = None
         self.v_updated_iters = None
+        self.verbose = verbose
 
     def fit(self, confs, labels, subgroups, params):
         """
@@ -55,6 +56,8 @@ class HKRRAlgorithm:
         # repeat until no updates made
         updated = True
         while updated and iter < self.max_iter:
+            if self.verbose:
+                print(f"Iteration {iter+1}...")
             updated = False
             iter += 1
 
@@ -108,6 +111,9 @@ class HKRRAlgorithm:
                         delta.append(dlta)
                         subgroup_updated.append(S_idx)
                         v_updated.append(v)
+
+                    if self.verbose:
+                        print(f"Updated uncertainty estimates for {len(S_v)} points in subgroup {S_idx} with v={v}")
 
             delta_iters.append(delta)
             subgroup_updated_iters.append(subgroup_updated)
@@ -200,7 +206,13 @@ class HKRRAlgorithm:
         early_stop = early_stop if early_stop else len(self.subgroup_updated_iters)
         mcb_preds = f_xs.copy()
 
-        for i in trange(len(f_xs)):
+        if self.verbose:
+            print(f"Predicting {len(f_xs)} data points...")
+            range_func = trange
+        else:
+            range_func = range
+        
+        for i in range_func(len(f_xs)):
             mcb_preds[i] = self._circuit_predict(f_xs[i], [j for j in range(len(groups)) if i in groups[j]], early_stop=early_stop)
 
         return mcb_preds

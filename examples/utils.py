@@ -53,16 +53,25 @@ def generate_correlated_subgroup_data(n_samples=1000):
 
 
 def plot_calibration(ax, y_true, y_pred, label, color):
+    """
+    Plot calibration curve for a given set of true labels and predicted probabilities.
+    """
     prob_true, prob_pred = calibration_curve(y_true, y_pred, n_bins=10, strategy='quantile')
     ax.plot(prob_pred, prob_true, marker='o', linewidth=2, label=label, color=color, markersize=4)
 
 
 def calibration_error(y_true, y_pred, n_bins=10):
+    """
+    Calculate the expected calibration error (ECE) for a set of true labels and predicted probabilities.
+    """
     prob_true, prob_pred = calibration_curve(y_true, y_pred, n_bins=n_bins, strategy='quantile')
     return np.mean(np.abs(prob_true - prob_pred))
 
 
 def create_calibration_plots(original_confs, labels, predictions, subgroups, method, n_groups=4):
+    """
+    Create calibration plots for the overall dataset and each subgroup.
+    """
     # Make directory for plots if it doesn't exist
     os.makedirs('plots', exist_ok=True) 
 
@@ -97,3 +106,28 @@ def create_calibration_plots(original_confs, labels, predictions, subgroups, met
     # plt.subplots_adjust(top=0.85)
     plt.tight_layout()
     plt.savefig(f'plots/{method}.png')
+
+
+def convert_groups(group_list, group_set):
+    """
+    Convert a list of group indices to a list of lists of indices, where each entry is a list of all indices of 
+        data belonging to a certain subgroup.
+    """
+    subgroups = []
+    for i in group_set:
+        # Indices of datapoints belonging to subgroup i in numpy
+        subgroup_indices = np.where(group_list == i)[0]
+        subgroups.append(subgroup_indices)
+
+    return subgroups
+
+
+def worst_group_calibration_error(labels, probs, groups):
+    """
+    Calculate the calibration error for the worst-performing group.
+    """
+    group_errors = []
+    for group in groups:
+        group_errors.append(calibration_error(labels[group], probs[group]))
+
+    return max(group_errors)
